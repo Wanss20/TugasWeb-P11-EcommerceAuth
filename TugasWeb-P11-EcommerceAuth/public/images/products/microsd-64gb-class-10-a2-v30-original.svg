@@ -1,0 +1,45 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 400 300" width="100%" height="100%">
+    <defs>
+        <linearGradient id="grad_50" x1="0%" y1="0%" x2="100%" y2="100%">
+            <stop offset="0%" stop-color="#991b1b" />
+            <stop offset="100%" stop-color="#450a0a" />
+        </linearGradient>
+        <radialGradient id="glow_50" cx="50%" cy="40%" r="50%">
+            <stop offset="0%" stop-color="#fca5a5" stop-opacity="0.25"/>
+            <stop offset="100%" stop-color="#450a0a" stop-opacity="0"/>
+        </radialGradient>
+        <filter id="shadow_50" x="-20%" y="-20%" width="140%" height="140%">
+            <feDropShadow dx="0" dy="8" stdDeviation="6" flood-color="#000000" flood-opacity="0.3"/>
+        </filter>
+    </defs>
+    
+    <!-- Background Card -->
+    <rect width="400" height="300" rx="16" fill="url(#grad_50)" />
+    <circle cx="200" cy="130" r="140" fill="url(#glow_50)" />
+
+    <!-- Top Badge -->
+    <rect x="24" y="20" width="130" height="28" rx="14" fill="#000000" opacity="0.4"/>
+    <text x="89" y="38" font-family="-apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif" font-size="11" font-weight="700" fill="#ffffff" text-anchor="middle">★ 64GB / V30 A2</text>
+
+    <!-- Gadget Illustration -->
+                <g transform="translate(140, 65)">
+                <!-- Card -->
+                <path d="M35 35 L75 35 L85 45 L85 105 L35 105 Z" fill="#1e293b" filter="drop-shadow(0 10px 18px rgba(0,0,0,0.4))"/>
+                <rect x="35" y="35" width="50" height="20" fill="#fca5a5"/>
+                <text x="60" y="50" font-family="Arial, sans-serif" font-size="9" font-weight="bold" fill="#ffffff" text-anchor="middle">MicroSD</text>
+                <!-- Gold pins -->
+                <rect x="40" y="90" width="5" height="12" fill="#fbbf24"/>
+                <rect x="48" y="90" width="5" height="12" fill="#fbbf24"/>
+                <rect x="56" y="90" width="5" height="12" fill="#fbbf24"/>
+                <rect x="64" y="90" width="5" height="12" fill="#fbbf24"/>
+                <rect x="72" y="90" width="5" height="12" fill="#fbbf24"/>
+            </g>
+
+    <!-- Bottom Glass Info Bar -->
+    <rect x="16" y="215" width="368" height="68" rx="14" fill="#ffffff" fill-opacity="0.12" stroke="#ffffff" stroke-opacity="0.2" stroke-width="1" filter="url(#shadow_50)"/>
+    
+    <!-- Text Labels -->
+    <text x="32" y="244" font-family="-apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif" font-size="14" font-weight="800" fill="#ffffff" letter-spacing="0.5">MICROSD 64GB</text>
+    <text x="32" y="264" font-family="-apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif" font-size="11" font-weight="500" fill="#fca5a5">Class 10 4K UHD Video Support</text>
+    <text x="368" y="254" font-family="-apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif" font-size="18" font-weight="900" fill="#ffffff" text-anchor="end">KSN</text>
+</svg>
