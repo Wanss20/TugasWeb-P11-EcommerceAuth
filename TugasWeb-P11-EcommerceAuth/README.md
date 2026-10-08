@@ -1,5 +1,8 @@
 # TugasWeb-P11-EcommerceAuth
 
+**Nama:** M Daffa Dzakwan  
+**NIM:** 4251250015  
+
 Tugas Rutin Pertemuan 11 — E-Commerce DB + Secure Auth (Laravel 12 + Breeze + Filament)
 
 ## Cara Menjalankan
@@ -49,10 +52,11 @@ Tambahan: kolom `role` di tabel `users`, dan tabel `posts` (untuk PostPolicy).
 ### 2. Seeders + Factories
 
 - `UserSeeder` → 4 akun testing + 15 pembeli random
-- `CategorySeeder` → 6 kategori
-- `ProductSeeder` → **60 produk** dengan nama & harga realistis (stok, berat, deskripsi dari factory)
+- `CategorySeeder` → 6 kategori camilan & oleh-oleh khas Medan (Kerupuk & Keripik, Makaroni & Camilan Pedas, Kue & Biskuit, Coklat & Permen, Kacang-kacangan, Madu & Herbal)
+- `ProductSeeder` → **78 produk** realistis dari katalog toko camilan khas Medan Shopee ksn2806 (nama asli, harga, berat, stok, dan deskripsi)
 - `OrderSeeder` → alamat, order, order item, pembayaran, dan review untuk tiap pembeli
-- `PostSeeder` → artikel dari admin & editor
+- `PostSeeder` → artikel promo & tips belanja dari admin & editor
+
 
 ### 3. Model, Relasi, Scope
 

@@ -11,21 +11,22 @@ class ReviewFactory extends Factory
     public function definition(): array
     {
         $komentar = [
-            'Barang sesuai deskripsi, pengiriman cepat.',
-            'Kualitas oke banget untuk harga segini.',
-            'Packing rapi, recommended seller!',
-            'Lumayan, tapi pengirimannya agak lama.',
-            'Barang bagus, bakal order lagi.',
-            'Kurang sesuai ekspektasi, warnanya beda dikit.',
-            'Mantap, original dan berfungsi normal.',
-            'Respon penjual cepat, puas belanja di sini.',
+            'Camilannya renyah dan gurih banget, bumbu daun jeruknya nendang!',
+            'Kualitas top! Rasa khas oleh-oleh Medannya berasa banget.',
+            'Packing rapi pakai bubble wrap tebal, snack sampai dengan aman tidak remuk.',
+            'Enak banget, pedas manisnya pas dan bikin nagih!',
+            'Barang fresh, expired date masih lama. Recommended seller!',
+            'Langsung habis dimakan sekeluarga, pasti bakal repeat order lagi.',
+            'Pengiriman dari Medan cepat sekali, rasa mantap jiwa!',
+            'Respon penjual ramah, produk original halal dan higienis.',
         ];
 
         return [
             'user_id' => User::factory(),
             'product_id' => Product::factory(),
-            'rating' => fake()->numberBetween(3, 5),
+            'rating' => fake()->numberBetween(4, 5),
             'comment' => fake()->randomElement($komentar),
         ];
     }
 }
+

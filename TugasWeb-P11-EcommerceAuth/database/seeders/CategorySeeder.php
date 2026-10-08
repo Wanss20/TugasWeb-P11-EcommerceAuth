@@ -11,12 +11,12 @@ class CategorySeeder extends Seeder
     public function run(): void
     {
         $categories = [
-            'Elektronik' => 'HP, laptop, dan aksesoris elektronik',
-            'Fashion Pria' => 'Baju, celana, dan sepatu pria',
-            'Fashion Wanita' => 'Pakaian dan aksesoris wanita',
-            'Makanan & Minuman' => 'Snack, kopi, dan minuman kemasan',
-            'Peralatan Rumah' => 'Perabot dan alat dapur',
-            'Olahraga' => 'Perlengkapan olahraga dan outdoor',
+            'Kerupuk & Keripik' => 'Aneka kerupuk lekor, keripik opak, emping aceh, kulit ikan patin, usus crispy, dan kerupuk seblak khas Medan',
+            'Makaroni & Camilan Pedas' => 'Makaroni pedas gurih, basreng daun jeruk, sosreng, stik balado, mie gulung pedas, dan siomay kering',
+            'Kue, Biskuit & Pastry' => 'Sus coklat lumer, cookies monsta, bronis mini coklat, curut keju, kue raja manis, dan wafer astor',
+            'Coklat, Permen & Manisan' => 'Coklat almond toples, bonibol coklat, donatello chruncy ball, permen somboy, somboi iris, dan manisan buah plum',
+            'Kacang & Biji-bijian' => 'Kacang arab, kacang tojin medan, kacang arcis polong, kacang madu lihin, dan kacang mete gurih',
+            'Madu, Minuman & Herbal' => 'Madu murni herbal super, susu kambing etawa, dan aneka minuman herbal khas nusantara',
         ];
 
         foreach ($categories as $name => $desc) {
@@ -28,3 +28,4 @@ class CategorySeeder extends Seeder
         }
     }
 }
+

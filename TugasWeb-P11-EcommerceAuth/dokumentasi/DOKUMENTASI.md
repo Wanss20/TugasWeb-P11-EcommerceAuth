@@ -2,8 +2,8 @@
 
 | | |
 |---|---|
-| **Nama** | Raymond Diaz Purba |
-| **NIM** | 4253250022 |
+| **Nama** | M Daffa Dzakwan |
+| **NIM** | 4251250015 |
 | **Repo** | TugasWeb-P11-EcommerceAuth |
 
 ---
@@ -26,9 +26,10 @@ Relasi foreign key antar tabel (phpMyAdmin Designer):
 
 ### 2. Seeders + Factories (50+ Produk)
 
-Data produk hasil seeder dengan nama, harga, dan deskripsi yang realistis (total 60 produk, lihat jumlah baris tabel `products` pada gambar daftar tabel di atas):
+Data produk hasil seeder dengan nama, harga, berat, dan deskripsi yang realistis sesuai katalog toko camilan khas Medan Shopee `ksn2806` (total 78 produk real, melampaui kriteria minimal 50+ produk):
 
 ![data products](screenshots/04-data-products.png)
+
 
 ### 3. Model + Relationships + Scope
 
