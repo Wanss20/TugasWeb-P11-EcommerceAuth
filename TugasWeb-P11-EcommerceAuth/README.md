@@ -1,139 +1,317 @@
-# TugasWeb-P11-EcommerceAuth
+# 🍪 MedanSnack — Platform E-Commerce Camilan & Oleh-Oleh Khas Medan
 
-**Nama:** M Daffa Dzakwan  
-**NIM:** 4251250015  
+> **Tugas Rutin 11 — Pemrograman Web Lanjutan**  
+> **Nama:** M Daffa Dzakwan  
+> **NIM:** 4251250015  
+> Implementasi Relasi Database Lanjutan, Eloquent ORM, Autentikasi Multi-Role & Otorisasi Keamanan Berbasis Kebijakan (*Policy*) pada Ekosistem **Laravel 12**, **Filament v3**, dan **Laravel Breeze**.
 
-Tugas Rutin Pertemuan 11 — E-Commerce DB + Secure Auth (Laravel 12 + Breeze + Filament)
+[![Laravel](https://img.shields.io/badge/Laravel-12.x-FF2D20?style=for-the-badge&logo=laravel&logoColor=white)](https://laravel.com)
+[![PHP](https://img.shields.io/badge/PHP-8.2%2B-777BB4?style=for-the-badge&logo=php&logoColor=white)](https://php.net)
+[![TailwindCSS](https://img.shields.io/badge/Tailwind_CSS-3.4-06B6D4?style=for-the-badge&logo=tailwind-css&logoColor=white)](https://tailwindcss.com)
+[![Filament](https://img.shields.io/badge/Filament_v3-Admin_Panel-FFA63D?style=for-the-badge&logo=filament&logoColor=white)](https://filamentphp.com)
+[![Breeze](https://img.shields.io/badge/Laravel-Breeze_Auth-E040FB?style=for-the-badge&logo=laravel&logoColor=white)](https://laravel.com/docs/starter-kits#laravel-breeze)
+[![License: MIT](https://img.shields.io/badge/License-MIT-blue.svg?style=for-the-badge)](LICENSE)
 
-## Cara Menjalankan
+---
 
-1. Nyalakan **MySQL** di XAMPP
-2. Buat database `db_ecommerce_p11` (sudah diatur di `.env`)
-3. Jalankan:
+## 📌 Ringkasan Proyek
+
+**MedanSnack** adalah aplikasi web e-commerce modern yang dirancang khusus untuk katalog penjualan berbagai macam camilan gurih, makanan ringan, dan oleh-oleh khas Medan (diadopsi dari katalog riil Shopee *ksn2806*).
+
+Aplikasi ini dibangun menggunakan arsitektur *Clean Code* Laravel dengan integritas relasi database yang ketat, pengamanan rute berbasis multi-role middleware, otorisasi granular berbasis Laravel Policy, serta panel administrasi berbasis **Filament v3**.
+
+---
+
+## 🎯 Status Penyelesaian Tugas (Checklist Tugas Rutin 11)
+
+| No | Modul / Persyaratan Tugas | Status | Keterangan Implementasi |
+|:--:|:---|:--:|:---|
+| **A.1** | **7+ Tabel Database Relasional** | ✅ Selesai | Tabel `users`, `categories`, `products`, `addresses`, `orders`, `order_items`, `payments`, `reviews`, dan `posts` dengan integritas FK (`constrained`, `cascadeOnDelete`, `restrictOnDelete`). |
+| **A.2** | **Seeders & Factories Realistis** | ✅ Selesai | **78 item produk riil** katalog camilan khas Medan dengan 6 kategori, ulasan pembeli, alamat, pembayaran, dan postingan artikel. |
+| **A.3** | **Model, Relasi & Local Scopes** | ✅ Selesai | Relasi One-to-Many, One-to-One, dan 4 Local Scopes (`active`, `inStock`, `priceBetween`, `status`). |
+| **A.4** | **5 Dokumentasi Query Tinker** | ✅ Selesai | Teruji langsung pada database aktif (Filter scope gabungan, withCount, Agregasi pendapatan, Relasi user order, dan Top rating withAvg). |
+| **B.5** | **Laravel Breeze Auth** | ✅ Selesai | Modul Login, Registrasi, Logout, Profile Management dari Laravel Breeze Blade. |
+| **B.6** | **Multi-Role & Custom Middleware** | ✅ Selesai | Kolom `role` (`admin`, `editor`, `user`) diamankan middleware `RoleMiddleware` dengan alias `role`. |
+| **B.7** | **Otorisasi Berbasis Policy** | ✅ Selesai | `PostPolicy` mengatur hak akses View, Create, Update/Delete khusus postingan sendiri bagi `editor`, dan hak penuh bagi `admin`. |
+| **B.8** | **Route Protection & Sesi Ganda** | ✅ Selesai | Terverifikasi via Browser Utama (Admin) vs Incognito (User biasa) dengan response HTTP 403 Forbidden untuk akses tidak sah. |
+| **⭐** | **Bonus: Filament Admin Panel v3** | ✅ Selesai | Panel administratif lengkap di URL `/filament` untuk manajemen data kategori, produk, dan pesanan. |
+| **⭐** | **Bonus: Demo Eager Loading (N+1)** | ✅ Selesai | Endpoint di `/admin/eager-loading` mendemonstrasikan perbandingan N+1 problem (41 queries vs 4 queries teroptimasi). |
+
+---
+
+## 🗄️ Arsitektur Database & Diagram Relasi (ERD)
+
+Aplikasi memiliki **7+ tabel entitas e-commerce utama** yang saling berelasi dengan integritas *Foreign Key*:
+
+```mermaid
+erDiagram
+    users ||--o{ addresses : "memiliki (hasMany)"
+    users ||--o{ orders : "melakukan (hasMany)"
+    users ||--o{ reviews : "memberikan (hasMany)"
+    users ||--o{ posts : "menulis (hasMany)"
+    
+    categories ||--o{ products : "mengelompokkan (hasMany)"
+    
+    products ||--o{ order_items : "terdapat pada (hasMany)"
+    products ||--o{ reviews : "menerima (hasMany)"
+    
+    addresses ||--o{ orders : "tujuan pengiriman (hasMany)"
+    
+    orders ||--o{ order_items : "memuat rincian (hasMany)"
+    orders ||--|| payments : "memiliki bukti (hasOne)"
+
+    users {
+        bigint id PK
+        string name
+        string email UK
+        enum role "admin, editor, user"
+        string password
+        timestamp created_at
+    }
+
+    categories {
+        bigint id PK
+        string name
+        string slug UK
+        text description
+        timestamp created_at
+    }
+
+    products {
+        bigint id PK
+        bigint category_id FK
+        string name
+        string slug UK
+        bigint price "dalam IDR"
+        integer stock
+        integer weight_gram
+        boolean is_active
+        text description
+        string image
+        timestamp created_at
+    }
+
+    addresses {
+        bigint id PK
+        bigint user_id FK
+        string recipient_name
+        string phone_number
+        text full_address
+        string city
+        string postal_code
+        timestamp created_at
+    }
+
+    orders {
+        bigint id PK
+        string order_number UK
+        bigint user_id FK
+        bigint address_id FK
+        bigint total_price
+        enum status "pending, processing, completed, cancelled"
+        timestamp created_at
+    }
+
+    order_items {
+        bigint id PK
+        bigint order_id FK
+        bigint product_id FK
+        integer quantity
+        bigint price
+        bigint subtotal
+        timestamp created_at
+    }
+
+    payments {
+        bigint id PK
+        bigint order_id FK "Unique"
+        string payment_method
+        bigint amount
+        enum status "pending, success, failed"
+        timestamp payment_date
+    }
+
+    reviews {
+        bigint id PK
+        bigint user_id FK
+        bigint product_id FK
+        integer rating "1-5"
+        text comment
+        timestamp created_at
+    }
+
+    posts {
+        bigint id PK
+        bigint user_id FK
+        string title
+        string slug UK
+        text content
+        boolean is_published
+        timestamp created_at
+    }
+```
+
+---
+
+## ⚡ Model Eloquent, Relasi & Local Scopes
+
+### 1. Definisi Relasi pada Model
+- **`User`**: `hasMany(Address::class)`, `hasMany(Order::class)`, `hasMany(Review::class)`, `hasMany(Post::class)`
+- **`Category`**: `hasMany(Product::class)`
+- **`Product`**: `belongsTo(Category::class)`, `hasMany(OrderItem::class)`, `hasMany(Review::class)`
+- **`Address`**: `belongsTo(User::class)`, `hasMany(Order::class)`
+- **`Order`**: `belongsTo(User::class)`, `belongsTo(Address::class)`, `hasMany(OrderItem::class, 'items')`, `hasOne(Payment::class)`
+- **`OrderItem`**: `belongsTo(Order::class)`, `belongsTo(Product::class)`
+- **`Payment`**: `belongsTo(Order::class)`
+- **`Review`**: `belongsTo(User::class)`, `belongsTo(Product::class)`
+- **`Post`**: `belongsTo(User::class)`
+
+### 2. Local Scopes
+```php
+// Product Scopes
+Product::active();                          // Produk dengan status is_active = true
+Product::inStock();                         // Produk dengan stok > 0
+Product::priceBetween($min, $max);          // Filter rentang harga
+
+// Order Scopes
+Order::status('completed');                 // Filter status pesanan
+```
+
+---
+
+## 💻 5 Dokumentasi Query Eloquent / Tinker
+
+Berikut 5 query pengujian Eloquent ORM via `php artisan tinker`:
+
+```php
+// 1. Mengambil produk aktif, ready stock, rentang harga Rp 20.000 - Rp 100.000 (Menggunakan 3 Local Scope)
+Product::active()->inStock()->priceBetween(20000, 100000)->take(5)->get(['id', 'name', 'price', 'stock']);
+
+// 2. Menghitung jumlah produk per masing-masing kategori
+Category::select('id', 'name')->withCount('products')->get();
+
+// 3. Menghitung total order berstatus 'completed' dan akumulasi pendapatannya
+[
+    'total_completed_orders' => Order::status('completed')->count(),
+    'total_revenue'          => Order::status('completed')->sum('total_price')
+];
+
+// 4. Riwayat order user tertentu beserta jumlah item pada tiap order
+User::where('email', 'user@toko.test')->first()->orders()
+    ->select('id', 'user_id', 'order_number', 'total_price', 'status')
+    ->withCount('items')
+    ->get();
+
+// 5. 5 Produk dengan rata-rata rating review tertinggi
+Product::select('id', 'name')
+    ->has('reviews')
+    ->withAvg('reviews', 'rating')
+    ->orderByDesc('reviews_avg_rating')
+    ->take(5)
+    ->get();
+```
+
+---
+
+## 🔒 Autentikasi Multi-Role & Otorisasi Keamanan
+
+### 1. Akun Pengujian (Testing Accounts)
+
+> 🔑 **Password Default Semua Akun:** `password`
+
+| Role | Nama | Email | Akses & Kewenangan |
+|:---|:---|:---|:---|
+| **Admin** | Administrator Toko | `admin@toko.test` | Akses penuh: Panel Filament, CRUD Semua Produk/Kategori/Order, CRUD Semua Post. |
+| **Editor** | Content Editor 1 | `editor@toko.test` | Mengelola & mengedit/menghapus postingan miliknya sendiri, membuat konten baru. |
+| **Editor** | Content Editor 2 | `editor2@toko.test` | Mengelola postingan milik sendiri (uji isolasi edit post sesama editor). |
+| **User** | Customer Biasa | `user@toko.test` | Membeli produk, melihat katalog, membaca artikel, memberikan review. |
+
+---
+
+### 2. Matriks Otorisasi PostPolicy (`app/Policies/PostPolicy.php`)
+
+| Aksi / Kemampuan | Admin | Editor (Pemilik Post) | Editor (Bukan Pemilik) | User Biasa | Tamu (Guest) |
+|:---|:---:|:---:|:---:|:---:|:---:|
+| **Lihat Daftar Post (`viewAny`)** | ✅ | ✅ | ✅ | ✅ | ❌ |
+| **Lihat Detail Post (`view`)** | ✅ | ✅ | ✅ | ✅ | ❌ |
+| **Buat Post Baru (`create`)** | ✅ | ✅ | ✅ | ❌ | ❌ |
+| **Edit Post (`update`)** | ✅ (Semua) | ✅ | ❌ (403) | ❌ | ❌ |
+| **Hapus Post (`delete`)** | ✅ (Semua) | ✅ | ❌ (403) | ❌ | ❌ |
+
+---
+
+### 3. Matriks Proteksi Rute (Route Protection)
+
+| Endpoint Rute | Middleware / Guard | Akses Diizinkan | Akses Ditolak (403/Redirect) |
+|:---|:---|:---|:---|
+| `/products`, `/posts` | `auth` | `admin`, `editor`, `user` | Guest (Redirect login) |
+| `/posts/create`, `/posts` (POST) | `auth`, `role:admin,editor` | `admin`, `editor` | `user` (403 Forbidden) |
+| `/posts/{id}/edit`, `update`, `destroy`| `auth`, `can:update/delete,post` | `admin`, Pemilik Post | User lain & Editor lain (403) |
+| `/admin/*` | `auth`, `role:admin` | `admin` | `editor`, `user` (403 Forbidden) |
+| `/filament/*` | `auth`, `role:admin` | `admin` | `editor`, `user` (403 Forbidden) |
+
+---
+
+## 🎁 Fitur Bonus Tambahan
+
+1. **⚡ Filament Admin Panel v3 (`/filament`)**
+   Panel admin interaktif modern untuk pengelolaan penuh data Resource E-Commerce (*Categories*, *Products*, *Orders*).
+2. **🚀 Demo Eager Loading vs N+1 Problem (`/admin/eager-loading`)**
+   Halaman demonstrasi komparasi query:
+   - **Lazy Loading (N+1)**: 41 SQL Queries dieksekusi.
+   - **Eager Loading (`with()`)**: Hanya 4 SQL Queries dieksekusi secara optimal.
+
+---
+
+## 🚀 Panduan Instalasi & Menjalankan Proyek
+
+### 1. Prasyarat Sistem
+- PHP >= 8.2
+- Composer
+- Node.js & NPM
+- MySQL Server (XAMPP / Laragon / Native)
+
+### 2. Langkah-Langkah Instalasi
 
 ```bash
+# 1. Masuk ke folder project
+cd TugasWeb-P11-EcommerceAuth
+
+# 2. Install dependensi PHP & JavaScript
 composer install
-npm install && npm run build
+npm install
+
+# 3. Konfigurasi Environment File
+cp .env.example .env
+php artisan key:generate
+
+# 4. Pastikan database MySQL aktif dan sesuai dengan .env:
+# DB_DATABASE=db_ecommerce_p11
+
+# 5. Jalankan migrasi dan seeding data realistis
 php artisan migrate:fresh --seed
+
+# 6. Kompilasi asset frontend
+npm run build
+
+# 7. Jalankan local development server
 php artisan serve
 ```
 
-4. Buka http://127.0.0.1:8000
-
-## Akun Testing
-
-Password semua akun: `password`
-
-| Role   | Email              |
-|--------|--------------------|
-| admin  | admin@toko.test    |
-| editor | editor@toko.test   |
-| editor | editor2@toko.test  |
-| user   | user@toko.test     |
+Akses aplikasi pada peramban web: [**http://127.0.0.1:8000**](http://127.0.0.1:8000)
 
 ---
 
-## Bagian A — Database & Eloquent
+## 🧪 Menjalankan Automated Tests
 
-### 1. Migrations (7 tabel e-commerce + FK)
+Aplikasi dilengkapi unit dan feature testing untuk memvalidasi proteksi role dan policy:
 
-| Tabel         | Foreign Key                                                   |
-|---------------|---------------------------------------------------------------|
-| categories    | -                                                             |
-| products      | category_id → categories (restrict on delete)                 |
-| addresses     | user_id → users (cascade)                                     |
-| orders        | user_id → users (cascade), address_id → addresses (set null)  |
-| order_items   | order_id → orders (cascade), product_id → products (restrict) |
-| payments      | order_id → orders (cascade, unique)                           |
-| reviews       | user_id → users (cascade), product_id → products (cascade)    |
-
-Tambahan: kolom `role` di tabel `users`, dan tabel `posts` (untuk PostPolicy).
-
-### 2. Seeders + Factories
-
-- `UserSeeder` → 4 akun testing + 15 pembeli random
-- `CategorySeeder` → 6 kategori camilan & oleh-oleh khas Medan (Kerupuk & Keripik, Makaroni & Camilan Pedas, Kue & Biskuit, Coklat & Permen, Kacang-kacangan, Madu & Herbal)
-- `ProductSeeder` → **78 produk** realistis dari katalog toko camilan khas Medan Shopee ksn2806 (nama asli, harga, berat, stok, dan deskripsi)
-- `OrderSeeder` → alamat, order, order item, pembayaran, dan review untuk tiap pembeli
-- `PostSeeder` → artikel promo & tips belanja dari admin & editor
-
-
-### 3. Model, Relasi, Scope
-
-- `Category` hasMany `Product`
-- `Product` belongsTo `Category`, hasMany `OrderItem`, hasMany `Review`
-- `User` hasMany `Address`, `Order`, `Review`, `Post`
-- `Order` belongsTo `User` & `Address`, hasMany `OrderItem` (`items`), hasOne `Payment`
-- `OrderItem` belongsTo `Order` & `Product`
-
-Scope:
-- `Product::active()` — produk yang aktif
-- `Product::inStock()` — stok > 0
-- `Product::priceBetween($min, $max)` — filter harga
-- `Order::status('completed')` — filter status order
-
-### 4. Query Tinker
-
-Jalankan `php artisan tinker`, lalu screenshot hasil tiap query:
-
-```php
-// 1. Produk aktif, ada stok, harga 100rb - 300rb (pakai 3 scope)
-Product::active()->inStock()->priceBetween(100000, 300000)->take(5)->get(['id', 'name', 'price', 'stock']);
-
-// 2. Jumlah produk tiap kategori
-Category::select('id', 'name')->withCount('products')->get();
-
-// 3. Jumlah order selesai & total pendapatannya
-[Order::status('completed')->count(), Order::status('completed')->sum('total_price')];
-
-// 4. Riwayat order milik user tertentu beserta jumlah itemnya
-User::where('email', 'user@toko.test')->first()->orders()->select('id', 'user_id', 'order_number', 'total_price', 'status')->withCount('items')->get();
-
-// 5. 5 produk dengan rata-rata rating tertinggi
-Product::select('id', 'name')->has('reviews')->withAvg('reviews', 'rating')->orderByDesc('reviews_avg_rating')->take(5)->get();
+```bash
+php artisan test --filter=RoleAccessTest
 ```
 
 ---
 
-## Bagian B — Auth & Security
-
-### 5. Breeze
-Login, register, logout, profile dari Laravel Breeze (Blade).
-
-### 6. Multi-role + Custom Middleware
-- Middleware: `app/Http/Middleware/RoleMiddleware.php`
-- Didaftarkan di `bootstrap/app.php` dengan alias `role`
-- Cara pakai: `->middleware('role:admin')` atau `->middleware('role:admin,editor')`
-
-### 7. PostPolicy
-`app/Policies/PostPolicy.php`
-
-| Aksi          | admin | editor               | user |
-|---------------|-------|----------------------|------|
-| lihat post    | ✅    | ✅                   | ✅   |
-| buat post     | ✅    | ✅                   | ❌   |
-| edit / hapus  | ✅ semua | ✅ post sendiri saja | ❌   |
-
-### 8. Route Protection
-
-| URL                    | Akses                  |
-|------------------------|------------------------|
-| /products, /posts      | semua user yang login  |
-| /posts/create, edit    | admin, editor (+ policy) |
-| /admin/*               | admin saja             |
-| /filament              | admin saja             |
-
-**Testing incognito 2 role:**
-1. Browser biasa → login `admin@toko.test` → bisa buka `/admin`, bisa edit/hapus semua post
-2. Jendela incognito → login `user@toko.test` → buka `/admin` → muncul **403 Forbidden**, tombol edit/hapus post tidak muncul
-3. (opsional) login `editor@toko.test` → bisa edit post sendiri, tapi buka `/posts/{id}/edit` punya editor lain → **403**
-
-Automated test: `php artisan test --filter=RoleAccessTest`
-
----
-
-## Bonus
-
-- **Filament admin panel** → http://127.0.0.1:8000/filament (login pakai akun admin). CRUD Kategori, Produk, Order.
-- **Demo eager loading** → http://127.0.0.1:8000/admin/eager-loading
-  Bandingin jumlah query tanpa `with()` (41 query, masalah N+1) vs pakai `with()` (4 query).
+<p align="center">
+  Dibuat dengan ❤️ untuk pemenuhan <b>Tugas Rutin 11 — Pemrograman Web Lanjutan</b>
+</p>
